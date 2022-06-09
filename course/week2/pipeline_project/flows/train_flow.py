@@ -71,22 +71,16 @@ class DigitClassifierFlow(FlowSpec):
       verbose = True,
     )
 
+    self.config = config
     # Logging is an important part of training a model. It helps us understand
     # what the model is doing and look out for early signs that something might 
     # be going wrong. We will be using 'Weights and Biases', a relatively new 
     # tool that makes logging in the cloud easy. 
-    # 
-    wandb_logger = WandbLogger(
-      project = config.wandb.project, 
-      offline = False,
-      entity = config.wandb.entity, 
-      name = 'mnist', 
-      save_dir = 'logs/wandb',
-      config = config)
+    #
 
     trainer = Trainer(
       max_epochs = config.system.optimizer.max_epochs,
-      logger = wandb_logger,
+      logger = self.create_wandb_logger(),
       callbacks = [checkpoint_callback])
 
     # when we save these objects to a `step`, they will be available
@@ -103,6 +97,7 @@ class DigitClassifierFlow(FlowSpec):
 
     # Call `fit` on the trainer with `system` and `dm`.
     # Our solution is one line.
+    self.trainer.logger = self.create_wandb_logger()
     self.trainer.fit(self.system, self.dm)
 
     # uncomment me when logging
@@ -115,6 +110,7 @@ class DigitClassifierFlow(FlowSpec):
     r"""Calls (offline) `test` on the trainer. Saves results to a log file."""
 
     # Load the best checkpoint and compute results using `self.trainer.test`
+    self.trainer.logger = self.create_wandb_logger()
     self.trainer.test(self.system, self.dm, ckpt_path = 'best')
     results = self.system.test_results
 
@@ -133,6 +129,16 @@ class DigitClassifierFlow(FlowSpec):
   def end(self):
     """End node!"""
     print('done! great work!')
+  
+  def create_wandb_logger(self):
+    return WandbLogger(
+      project = self.config.wandb.project, 
+      offline = False,
+      entity = self.config.wandb.entity, 
+      name = 'mnist', 
+      save_dir = 'logs/wandb',
+      config = self.config
+    )
 
 
 if __name__ == "__main__":

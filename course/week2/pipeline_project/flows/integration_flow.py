@@ -68,10 +68,9 @@ class DigitClassifierFlow(FlowSpec):
     )
 
     self.config = config
-    self.wandb_logger = self.create_wandb_logger()
     trainer = Trainer(
       max_epochs = config.system.optimizer.max_epochs,
-      logger = self.wandb_logger,
+      logger = self.create_wandb_logger(),
       callbacks = [checkpoint_callback])
 
     self.dm = dm

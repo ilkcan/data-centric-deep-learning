@@ -67,6 +67,7 @@ class DigitClassifierFlow(FlowSpec):
       verbose = True,
     )
 
+    self.config = config
     trainer = Trainer(
       max_epochs = config.system.optimizer.max_epochs,
       logger = self.create_wandb_logger(),
@@ -110,8 +111,8 @@ class DigitClassifierFlow(FlowSpec):
 
   @step
   def regression_test(self):
-    r"""Runs an integration test. Saves results to a log file."""
-
+    r"""Runs a regression test. Saves results to a log file."""
+    self.trainer.logger = self.create_wandb_logger()
     test = MNISTRegressionTest()
     test.test(self.trainer, self.system)
 

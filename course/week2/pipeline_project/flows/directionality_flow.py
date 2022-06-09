@@ -67,17 +67,11 @@ class DigitClassifierFlow(FlowSpec):
       verbose = True,
     )
 
-    wandb_logger = WandbLogger(
-      project = config.wandb.project, 
-      offline = False,
-      entity = config.wandb.entity, 
-      name = 'mnist', 
-      save_dir = 'logs/wandb',
-      config = config)
+    self.config = config
 
     trainer = Trainer(
       max_epochs = config.system.optimizer.max_epochs,
-      logger = wandb_logger,
+      logger = self.create_wandb_logger(),
       callbacks = [checkpoint_callback])
 
     self.dm = dm
@@ -89,7 +83,7 @@ class DigitClassifierFlow(FlowSpec):
   @step
   def train_model(self):
     """Calls `fit` on the trainer."""
-
+    self.trainer.logger = self.create_wandb_logger()
     self.trainer.fit(self.system, self.dm)
 
     wandb.finish()  # close wandb run
@@ -101,6 +95,7 @@ class DigitClassifierFlow(FlowSpec):
     r"""Calls (offline) `test` on the trainer. Saves results to a log file."""
 
     # Load the best checkpoint and compute results using `self.trainer.test`
+    self.trainer.logger = self.create_wandb_logger()
     self.trainer.test(self.system, self.dm, ckpt_path = 'best')
     results = self.system.test_results
 
@@ -118,7 +113,7 @@ class DigitClassifierFlow(FlowSpec):
   @step
   def directionality_test(self):
     r"""Runs an directionality test. Saves results to a log file."""
-
+    self.trainer.logger = self.create_wandb_logger()
     test = MNISTDirectionalityTest()
     test.test(self.trainer, self.system)
 
@@ -138,7 +133,16 @@ class DigitClassifierFlow(FlowSpec):
   def end(self):
     """End node!"""
     print('done! great work!')
-
+  
+  def create_wandb_logger(self):
+    return WandbLogger(
+      project = self.config.wandb.project, 
+      offline = False,
+      entity = self.config.wandb.entity, 
+      name = 'mnist', 
+      save_dir = 'logs/wandb',
+      config = self.config
+    )
 
 if __name__ == "__main__":
   """
