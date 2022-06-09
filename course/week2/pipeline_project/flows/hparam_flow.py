@@ -90,7 +90,6 @@ class DigitClassifierFlow(FlowSpec):
     # need a few of them so no need to call `merge_artifacts`
     self.dm = inputs[0].dm
 
-    scores = []        # populate with scores from each hparams
     best_index = None  # replace with best index
     
     # ================================
@@ -114,6 +113,10 @@ class DigitClassifierFlow(FlowSpec):
     # scores: List[float] 
     # best_index: integer 
     # ================================
+
+    ## Solution
+    scores = [input.callback.best_model_score for input in inputs]
+    best_index = np.argmax(scores)
 
     # sanity check for scores length
     assert len(scores) == len(list(inputs)), "Hmm. Incorrect length for scores."
