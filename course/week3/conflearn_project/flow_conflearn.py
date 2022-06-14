@@ -163,6 +163,10 @@ class TrainIdentifyReview(FlowSpec):
       # Create `Trainer` and call `fit`.
       # Call `predict` on `Trainer` and the test data loader.
       # Convert probabilities back to numpy (make sure 1D).
+      # 
+      # Types:
+      # --
+      # probs_: np.array[float] (shape: |test set|)
       # ===============================================
       X_train, X_test = X[train_index], X[test_index]
       y_train, y_test = y[train_index], y[test_index]
@@ -228,6 +232,10 @@ class TrainIdentifyReview(FlowSpec):
     # HINT: use cleanlab. See tutorial. 
     # 
     # Our solution is one function call.
+    # 
+    # Types
+    # --
+    # ranked_label_issues: List[int]
     # =============================
     ranked_label_issues = find_label_issues(
       np.asarray(self.all_df.label),
