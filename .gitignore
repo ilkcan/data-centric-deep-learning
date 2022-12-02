@@ -134,3 +134,5 @@ dmypy.json
 **ckpts/
 **artifacts/
 **.pt
+
+course/week2/pipeline_project/src/tests/images/
