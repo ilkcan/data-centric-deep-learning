@@ -113,6 +113,16 @@ class DigitClassifierFlow(FlowSpec):
     # --
     # scores: List[float] 
     # best_index: integer 
+    scores = [input.callback.best_model_score for input in inputs]
+    best_index = np.argmax(scores)
+    
+    # get the best system / trainer
+    # we drop the callback
+    self.system = inputs[best_index].system
+    self.trainer = inputs[best_index].trainer
+
+    # save the best width
+    self.best_width = inputs[best_index].widths[best_index]
     # ================================
 
     # sanity check for scores length
