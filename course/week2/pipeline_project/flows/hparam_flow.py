@@ -114,13 +114,9 @@ class DigitClassifierFlow(FlowSpec):
     # scores: List[float] 
     # best_index: integer 
     # ================================
+    scores = [input.callback.best_model_score for input in inputs]
+    best_index = np.argmax(scores)
 
-    # sanity check for scores length
-    assert len(scores) == len(list(inputs)), "Hmm. Incorrect length for scores."
-    # sanity check for best_index
-    assert best_index is not None
-    assert best_index >= 0 and best_index < len(list(inputs))
-    
     # get the best system / trainer
     # we drop the callback
     self.system = inputs[best_index].system
@@ -128,6 +124,12 @@ class DigitClassifierFlow(FlowSpec):
 
     # save the best width
     self.best_width = inputs[best_index].widths[best_index]
+
+    # sanity check for scores length
+    assert len(scores) == len(list(inputs)), "Hmm. Incorrect length for scores."
+    # sanity check for best_index
+    assert best_index is not None
+    assert best_index >= 0 and best_index < len(list(inputs))
 
     # only the best model proceeds to offline test
     self.next(self.offline_test)
