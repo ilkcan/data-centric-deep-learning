@@ -48,6 +48,7 @@ class TrainClassifier(FlowSpec):
     """
     # configuration files contain all hyperparameters
     config = load_config(self.config_path)
+    print(self.config_path)
 
     # a data module wraps around training, dev, and test datasets
     dm = ReviewDataModule(config)
